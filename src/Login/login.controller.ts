@@ -1,33 +1,38 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { LoginService } from './login.service';
-import { User } from '../entities/user.entities';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-
-function getEmailCode() {
-  const min = 100000; // 最小值为100000
-  const max = 999999; // 最大值为999999
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+import { Response } from 'express';
 
 @Controller('login')
 export class LoginController {
-  constructor(
-    private readonly appService: LoginService,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  constructor(private readonly appService: LoginService) {}
 
-  @Post('/lg')
-  login(): string {
-    return this.appService.getHello();
+  @Post('lg')
+  async login(
+    @Body()
+    { qq, code, sendTime }: { qq: string; code: string; sendTime: string },
+    @Res() res: Response,
+  ): Promise<void> {
+    const token = await this.appService.fetchLogin(qq, code, sendTime);
+    res.customerSend(`登录${token ? '成功' : '失败'}`, HttpStatus.OK, {
+      token,
+    });
   }
 
   @Get('/send')
-  sendCode(@Body() qq: string): void {
-    const user = new User();
-    user.code = getEmailCode() + '';
-    user.qq = qq;
-    user.sendTime = +new Date() + '';
-    this.userRepository.save(user);
+  async sendCode(
+    @Query() { qq }: { qq: string },
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.appService.getSendEmailCode(qq);
+    res.customerSend('发送验证码成功', HttpStatus.OK, {});
   }
 }
