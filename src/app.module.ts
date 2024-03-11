@@ -1,12 +1,11 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { LoginController } from './Login/login.controller';
-import { LoginService } from './Login/login.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 import { LoginModule } from './Login/login.module';
-import { User } from './entities/user.entities';
-import { Userinfo } from './entities/Userinfo.entities';
+import { User } from './entities/User.entities';
+import { UserInfo } from './entities/Userinfo.entities';
 import { ResponseMiddleware } from './Middleware/Response.middleware';
+import { HobbyList } from './entities/HobbyList.entities';
 
 dotenv.config();
 
@@ -19,7 +18,7 @@ dotenv.config();
       username: process.env.USER,
       password: process.env.PASSWORD,
       database: `${process.env.DATABASE}`,
-      entities: [User, Userinfo],
+      entities: [User, UserInfo, HobbyList],
     }),
     LoginModule,
   ],

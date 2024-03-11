@@ -1,8 +1,10 @@
-import { User } from '@/entities/user.entities';
+import { User } from '@/entities/User.entities';
+import { HobbyList } from '@/entities/HobbyList.entities';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as jwt from 'jsonwebtoken';
+import { UserInfo } from '@/entities/Userinfo.entities';
 
 export function getEmailCode() {
   const min = 100000; // 最小值为100000
@@ -14,6 +16,10 @@ export function getEmailCode() {
 export class LoginService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(HobbyList)
+    private readonly hobbyRepository: Repository<HobbyList>,
+    @InjectRepository(UserInfo)
+    private readonly userInfoRepository: Repository<UserInfo>,
   ) {}
 
   async fetchLogin(
@@ -64,5 +70,19 @@ export class LoginService {
     } catch (error) {
       throw new Error('Invalid token');
     }
+  }
+
+  async findUser(qq: string) {
+    return await this.userInfoRepository.findOne({ where: { qq } });
+  }
+
+  async getHobbyList() {
+    return await this.hobbyRepository.find({});
+  }
+
+  async setUserInfo(info: UserInfo) {
+    const userInfo = new UserInfo();
+    Object.assign(userInfo, info);
+    this.userInfoRepository.save(userInfo);
   }
 }
