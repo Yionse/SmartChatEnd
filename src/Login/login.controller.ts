@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { LoginService } from './login.service';
 import { Response } from 'express';
-import { User } from '@/entities/User.entities';
 import { UserInfo } from '@/entities/Userinfo.entities';
 
 @Controller('login')
@@ -23,17 +22,11 @@ export class LoginController {
     @Res() res: Response,
   ): Promise<void> {
     const findOne = await this.appService.findUser(qq);
-    if (qq === '1') {
-      res.customerSend(`登录成功`, HttpStatus.OK, {
-        token: 'WWWWWWWWWWWWWASDASDWDQASDASDDSDAS',
-        isSetUser: findOne?.qq ? false : true,
-      });
-      return;
-    }
     const token = await this.appService.fetchLogin(qq, code, sendTime);
     res.customerSend(`登录${token ? '成功' : '失败'}`, HttpStatus.OK, {
       token,
       isSetUser: findOne?.qq ? false : true,
+      userInfo: findOne,
     });
   }
 
@@ -57,5 +50,15 @@ export class LoginController {
   async getHobbyList(@Res() res: Response) {
     const hobbyList = await this.appService.getHobbyList();
     res.customerSend('获取爱好列表成功', HttpStatus.OK, { hobbyList });
+  }
+
+  @Post('verify')
+  async verifyToken(
+    @Body() { token }: { token: string },
+    @Res() res: Response,
+  ) {
+    const tokenInfo = await this.appService.verifyToken(token);
+    const userInfo = await this.appService.findUser(tokenInfo?.user);
+    res.customerSend('验证成功', HttpStatus.OK, { userInfo });
   }
 }

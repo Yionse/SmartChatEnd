@@ -45,13 +45,14 @@ export class LoginService {
 
   async getSendEmailCode(qq: string): Promise<void> {
     const userList = await this.userRepository.findOne({ where: { qq } });
+    // 开发环境下，直接设置为123123
     if (userList) {
-      userList.code = getEmailCode() + '';
+      userList.code = '123123';
       userList.sendTime = +new Date() + '';
       await this.userRepository.save(userList);
     } else {
       const user = new User();
-      user.code = getEmailCode() + '';
+      user.code = '123123';
       user.qq = qq;
       user.sendTime = +new Date() + '';
       await this.userRepository.save(user);
