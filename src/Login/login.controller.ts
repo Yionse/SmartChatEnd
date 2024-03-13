@@ -42,7 +42,6 @@ export class LoginController {
   @Post('info')
   async setUserInfo(@Body() info: UserInfo, @Res() res: Response) {
     await this.appService.setUserInfo(info);
-    console.log(info);
     res.customerSend('设置个人信息成功', HttpStatus.OK, { isSuccess: true });
   }
 
@@ -54,11 +53,12 @@ export class LoginController {
 
   @Post('verify')
   async verifyToken(
-    @Body() { token }: { token: string },
+    @Body() { token, location }: { token: string; location: string },
     @Res() res: Response,
   ) {
     const tokenInfo = await this.appService.verifyToken(token);
     const userInfo = await this.appService.findUser(tokenInfo?.user);
+    await this.appService.updateLocation(location, userInfo.qq);
     res.customerSend('验证成功', HttpStatus.OK, { userInfo });
   }
 }

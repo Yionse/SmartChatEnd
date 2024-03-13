@@ -86,4 +86,11 @@ export class LoginService {
     Object.assign(userInfo, info);
     this.userInfoRepository.save(userInfo);
   }
+
+  async updateLocation(location: string, qq: string) {
+    // 找到该用户，更新IP
+    const userInfo = await this.findUser(qq);
+    userInfo.location = location;
+    await this.userInfoRepository.save(userInfo);
+  }
 }

@@ -15,4 +15,7 @@ export class UserInfo {
 
   @Column('varchar', { name: 'hobbyList', length: 60 })
   hobbyList: string;
+
+  @Column('varchar', { name: 'location', length: 6 })
+  location: string;
 }
