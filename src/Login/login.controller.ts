@@ -18,10 +18,18 @@ export class LoginController {
   @Post('lg')
   async login(
     @Body()
-    { qq, code, sendTime }: { qq: string; code: string; sendTime: string },
+    {
+      qq,
+      code,
+      sendTime,
+      location,
+    }: { qq: string; code: string; sendTime: string; location: string },
     @Res() res: Response,
   ): Promise<void> {
     const findOne = await this.appService.findUser(qq);
+    if (findOne) {
+      this.appService.updateLocation(location, findOne.qq);
+    }
     const token = await this.appService.fetchLogin(qq, code, sendTime);
     res.customerSend(`登录${token ? '成功' : '失败'}`, HttpStatus.OK, {
       token,

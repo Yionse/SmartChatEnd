@@ -18,4 +18,7 @@ export class UserInfo {
 
   @Column('varchar', { name: 'location', length: 6 })
   location: string;
+
+  @Column('varchar', { name: 'signature', length: 42 })
+  signature: string;
 }
