@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "service": "pm2 start yarn --name 'SmartChat' -- start",
+    "service": "rimraf ./node_modules && pm2 delete SmartChat && start yarn --name 'SmartChat' -- start",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start --watch",

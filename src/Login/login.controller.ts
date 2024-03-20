@@ -69,4 +69,17 @@ export class LoginController {
     await this.appService.updateLocation(location, userInfo.qq);
     res.customerSend('验证成功', HttpStatus.OK, { userInfo });
   }
+
+  @Post('upInfo')
+  async updateUserInfo(@Body() info: UserInfo, @Res() res: Response) {
+    await this.appService.updateUserInfo(info);
+    res.customerSend('修改个人信息成功', HttpStatus.OK, {});
+  }
+
+  @Get('getInfo')
+  async getUserInfo(@Query() { qq }: { qq: string }, @Res() res: Response) {
+    res.customerSend('获取个人信息成功', HttpStatus.OK, {
+      userInfo: await this.appService.findUser(qq),
+    });
+  }
 }

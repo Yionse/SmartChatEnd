@@ -93,4 +93,13 @@ export class LoginService {
     userInfo.location = location;
     await this.userInfoRepository.save(userInfo);
   }
+
+  async updateUserInfo(userInfo: UserInfo) {
+    let awaitUpdateUserInfo = await this.findUser(userInfo.qq);
+    awaitUpdateUserInfo = {
+      ...awaitUpdateUserInfo,
+      ...userInfo,
+    };
+    await this.userInfoRepository.save(awaitUpdateUserInfo);
+  }
 }

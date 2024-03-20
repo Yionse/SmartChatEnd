@@ -6,6 +6,8 @@ import { User } from './entities/User.entities';
 import { UserInfo } from './entities/Userinfo.entities';
 import { ResponseMiddleware } from './Middleware/Response.middleware';
 import { HobbyList } from './entities/HobbyList.entities';
+import { Forum } from './entities/Forum.entities';
+import { ForumModule } from './Forum/Forum.module';
 
 dotenv.config();
 
@@ -18,9 +20,10 @@ dotenv.config();
       username: process.env.USER,
       password: process.env.PASSWORD,
       database: `${process.env.DATABASE}`,
-      entities: [User, UserInfo, HobbyList],
+      entities: [User, UserInfo, HobbyList, Forum],
     }),
     LoginModule,
+    ForumModule,
   ],
 })
 export class AppModule implements NestModule {
