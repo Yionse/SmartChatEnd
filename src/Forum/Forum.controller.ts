@@ -12,6 +12,7 @@ import { Response } from 'express';
 import { ForumServices } from './Forum.services';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ForumComment } from '@/entities/ForumComment.entities';
 
 @Controller('forum')
 export class ForumController {
@@ -33,5 +34,14 @@ export class ForumController {
       HttpStatus.OK,
       await this.appServices.personalList(user || ''),
     );
+  }
+
+  @Post('comment')
+  async createComment(
+    @Body() forumComment: ForumComment,
+    @Res() res: Response,
+  ) {
+    await this.appServices.createComment(forumComment);
+    res.customerSend('发布评论成功', HttpStatus.OK, {});
   }
 }
