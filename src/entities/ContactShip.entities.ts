@@ -1,17 +1,23 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('contactShip')
-export class ContactShip {
-  @PrimaryColumn('int', { name: 'id' })
-  id?: number;
+@Entity('contact')
+export class Contact {
+  @PrimaryColumn('int', { name: 'from', length: 13 })
+  from: string;
 
-  @Column('int', { name: 'requestId' })
-  requestId: number;
+  @PrimaryColumn('int', { name: 'target', length: 13 })
+  target: string;
 
-  @Column('int', { name: 'targetId' })
-  targetId: number;
+  @Column('varchar', { name: 'verifyInfo', length: 100 })
+  verifyInfo: string;
 
   // 1-正常，0-待同意，-1-已拒绝
-  @Column('char', { name: 'status', length: 3 })
-  status: string;
+  @Column('int', { name: 'status' })
+  status: number;
+
+  @Column('varchar', { name: 'status', length: 20 })
+  fromRemark: string;
+
+  @Column('varchar', { name: 'status', length: 20 })
+  targetRemark: string;
 }

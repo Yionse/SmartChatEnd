@@ -9,8 +9,8 @@ import { HobbyList } from './entities/HobbyList.entities';
 import { Forum } from './entities/Forum.entities';
 import { ForumModule } from './Forum/Forum.module';
 import { ForumComment } from './entities/ForumComment.entities';
-import { ContactShip } from './entities/ContactShip.entities';
 import { ContactModule } from './Contact/Contact.module';
+import { Contact } from './entities/ContactShip.entities';
 
 dotenv.config();
 
@@ -23,7 +23,7 @@ dotenv.config();
       username: process.env.USER,
       password: process.env.PASSWORD,
       database: `${process.env.DATABASE}`,
-      entities: [User, UserInfo, HobbyList, Forum, ForumComment, ContactShip],
+      entities: [User, UserInfo, HobbyList, Forum, ForumComment, Contact],
     }),
     LoginModule,
     ForumModule,
