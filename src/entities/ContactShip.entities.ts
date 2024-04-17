@@ -2,10 +2,13 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('contact')
 export class Contact {
-  @PrimaryColumn('int', { name: 'from', length: 13 })
+  @PrimaryColumn('int')
+  id?: number;
+
+  @Column('varchar', { name: 'from', length: 13 })
   from: string;
 
-  @PrimaryColumn('int', { name: 'target', length: 13 })
+  @Column('varchar', { name: 'target', length: 13 })
   target: string;
 
   @Column('varchar', { name: 'verifyInfo', length: 100 })
@@ -13,11 +16,11 @@ export class Contact {
 
   // 1-正常，0-待同意，-1-已拒绝
   @Column('int', { name: 'status' })
-  status: number;
+  status: 1 | 0 | -1;
 
-  @Column('varchar', { name: 'status', length: 20 })
+  @Column('varchar', { name: 'fromRemark', length: 20 })
   fromRemark: string;
 
-  @Column('varchar', { name: 'status', length: 20 })
+  @Column('varchar', { name: 'targetRemark', length: 20 })
   targetRemark: string;
 }

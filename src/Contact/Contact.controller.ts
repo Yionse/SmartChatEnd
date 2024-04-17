@@ -39,6 +39,29 @@ export class ContactController {
   @Post('request')
   async request(@Body() contact: Contact, @Res() res: Response) {
     await this.service.requestAdd(contact);
-    // res.customerSend('添加好友成功', )
+    res.customerSend('发起好友申请', HttpStatus.OK, {});
   }
+
+  @Get('verifyList')
+  async getNumber(
+    @Query() { target }: { target: string },
+    @Res() res: Response,
+  ) {
+    const list = await this.service.getVerifyList(target);
+    res.customerSend('好友申请列表', HttpStatus.OK, list);
+  }
+
+  @Post('verify')
+  async verify(
+    @Body()
+    {
+      from,
+      status,
+      targetRemark,
+    }: {
+      from: string;
+      status: number;
+      targetRemark?: string;
+    },
+  ) {}
 }
