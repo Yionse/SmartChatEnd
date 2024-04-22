@@ -12,6 +12,31 @@ export class ContactServices {
     @InjectRepository(Contact)
     private readonly contactRepository: Repository<Contact>,
   ) {}
+  // 状态：不可添加(待同意-已是好友-待验证) 可添加(已被拒绝)
+  // 展示的文字：对应不可添加(待同意-null-去验证)
+  // from当前搜索用户
+  async isAddContact(from: string, target: string) {
+    let text = '';
+    const correlation = await this.contactRepository.find({
+      where: [
+        { from, target },
+        { from: target, target: from },
+      ],
+    });
+    const isAdd =
+      correlation.length === 0 ||
+      correlation.every((item) => item.status === -1);
+    if (!isAdd) {
+      if (correlation?.[0].status === 1) {
+        text = '';
+      } else if (correlation?.[0].from === from) {
+        text = '待同意';
+      } else if (correlation?.[0].target === from) {
+        text = '去验证';
+      }
+    }
+    return { isAdd, text, id: correlation?.[0]?.id };
+  }
 
   async getRecommendList(user: string) {
     const list = await this.userInfoRepository.find();
@@ -19,7 +44,8 @@ export class ContactServices {
     const filterUser = list.filter((item) => item.qq !== user);
     const meHobbyList = me.hobbyList.split('-') || [];
     const arr: UserInfo[] = [];
-    filterUser.forEach((item) => {
+    // 将相同爱好筛选出来
+    for (const item of filterUser) {
       let isPush = false;
       meHobbyList.forEach((hobby) => {
         if (item.hobbyList.includes(hobby)) {
@@ -27,20 +53,25 @@ export class ContactServices {
           return;
         }
       });
-      if (isPush) {
+      if (isPush && (await this.isAddContact(user, item.qq)).isAdd) {
+        item['isAdd'] = await this.isAddContact(user, item.qq);
         arr.push(item);
       }
-    });
+    }
     return arr.slice(0, 5);
   }
 
-  async searchUser(key: string) {
-    return await this.userInfoRepository
+  async searchUser(key: string, from: string) {
+    const list = await this.userInfoRepository
       .createQueryBuilder('user')
       .where('user.qq LIKE :key', { key: `%${key}%` })
       .orWhere('user.userName LIKE :key', { key: `%${key}%` })
       .orWhere('user.hobbyList LIKE :key', { key: `%${key}%` })
       .getMany();
+    for (const item of list) {
+      item['isAdd'] = await this.isAddContact(from, item.qq);
+    }
+    return list.filter((item) => item.qq !== from);
   }
 
   async requestAdd(contact: Contact) {

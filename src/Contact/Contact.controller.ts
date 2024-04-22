@@ -10,10 +10,15 @@ import {
 import { ContactServices } from './Contact.services';
 import { Response } from 'express';
 import { Contact } from '@/entities/ContactShip.entities';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Controller('contact')
 export class ContactController {
-  constructor(private readonly service: ContactServices) {}
+  constructor(
+    private readonly service: ContactServices,
+    @InjectRepository(Contact) private readonly repository: Repository<Contact>,
+  ) {}
 
   @Post('recommend')
   async getRecommendList(
@@ -28,11 +33,14 @@ export class ContactController {
   }
 
   @Get('search')
-  async searchUser(@Query() { key }: { key: string }, @Res() res: Response) {
+  async searchUser(
+    @Query() { key, from }: { key: string; from: string },
+    @Res() res: Response,
+  ) {
     res.customerSend(
       '搜索成功',
       HttpStatus.OK,
-      await this.service.searchUser(key),
+      await this.service.searchUser(key, from),
     );
   }
 
@@ -51,17 +59,30 @@ export class ContactController {
     res.customerSend('好友申请列表', HttpStatus.OK, list);
   }
 
+  // 好友申请状态变更
   @Post('verify')
   async verify(
     @Body()
     {
-      from,
+      id,
       status,
       targetRemark,
     }: {
-      from: string;
+      id: number;
       status: number;
       targetRemark?: string;
     },
-  ) {}
+    @Res() res: Response,
+  ) {
+    console.log(status, targetRemark);
+
+    const verifyItem = await this.repository.findOne({ where: { id } });
+    console.log(verifyItem);
+
+    Object.assign(verifyItem, { status, targetRemark });
+    console.log(verifyItem);
+
+    await this.repository.save(verifyItem);
+    res.customerSend('操作成功', HttpStatus.OK, {});
+  }
 }
