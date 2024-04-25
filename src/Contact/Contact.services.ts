@@ -90,6 +90,32 @@ export class ContactServices {
         (userInfo) => userInfo.qq === verifyItem[key],
       );
     });
-    return verifyList.filter((verify) => verify.status !== 1);
+    return verifyList;
+  }
+
+  // 获取某个人的所有联系人
+  async getContactList(user: string) {
+    const userList = await this.userInfoRepository.find();
+    const list = await this.contactRepository.find({
+      where: [{ from: user }, { target: user }],
+    });
+    return list
+      .filter((item) => item.status === 1)
+      .map((item) => {
+        let key = '';
+        let remark = '';
+        if (item.from === user) {
+          key = 'from';
+          remark = item.fromRemark;
+        } else {
+          key = 'target';
+          remark = item.targetRemark;
+        }
+        item['userInfo'] = userList.find(
+          (userInfo) => userInfo.qq === item[key],
+        );
+        item['remark'] = remark;
+        return item;
+      });
   }
 }

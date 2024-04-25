@@ -10,11 +10,15 @@ declare module 'express' {
 @Injectable()
 export class ResponseMiddleware implements NestMiddleware {
   use(_: any, res: Response, next: (error?: any) => void) {
-    res.customerSend = function (message: string, code: HttpStatus, data: any) {
+    res.customerSend = function (
+      message: string,
+      code: HttpStatus,
+      data?: any,
+    ) {
       res.send({
         message,
         code,
-        result: data,
+        result: data || {},
       });
     };
     next();

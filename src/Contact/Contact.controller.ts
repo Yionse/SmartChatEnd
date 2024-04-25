@@ -12,11 +12,13 @@ import { Response } from 'express';
 import { Contact } from '@/entities/ContactShip.entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { LoginService } from '@/Login/login.service';
 
 @Controller('contact')
 export class ContactController {
   constructor(
     private readonly service: ContactServices,
+    private readonly userInfoService: LoginService,
     @InjectRepository(Contact) private readonly repository: Repository<Contact>,
   ) {}
 
@@ -74,15 +76,27 @@ export class ContactController {
     },
     @Res() res: Response,
   ) {
-    console.log(status, targetRemark);
-
     const verifyItem = await this.repository.findOne({ where: { id } });
-    console.log(verifyItem);
-
     Object.assign(verifyItem, { status, targetRemark });
-    console.log(verifyItem);
-
     await this.repository.save(verifyItem);
     res.customerSend('操作成功', HttpStatus.OK, {});
+  }
+
+  @Get('list')
+  async getContactList(@Query() { qq }: { qq: string }, @Res() res: Response) {
+    res.customerSend(
+      '查询联系人列表成功',
+      HttpStatus.OK,
+      await this.service.getContactList(qq),
+    );
+  }
+
+  @Get('detail')
+  async getDetail(@Query() { qq }: { qq: string }, @Res() res: Response) {
+    res.customerSend(
+      '查询联系人详情成功',
+      HttpStatus.OK,
+      await this.userInfoService.findUser(qq),
+    );
   }
 }
